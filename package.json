@@ -1,0 +1,31 @@
+{
+  "name": "usgs-waterservices-openapi",
+  "version": "1.0.0",
+  "description": "Api Contract for USGS Water Services",
+  "main": "index.js",
+  "scripts": {
+    "generate:docs": "redoc-cli build src/openapi.yaml -o tmp/index.html",
+    "lint:yaml": "yaml-lint src/openapi.yaml",
+    "lint:swagger": "swagger-cli validate src/openapi.yaml"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/johnStauffer/usgs-waterservices-openapi.git"
+  },
+  "keywords": [
+    "USGS",
+    "Water Services"
+  ],
+  "author": "John Stauffer",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/johnStauffer/usgs-waterservices-openapi/issues"
+  },
+  "homepage": "https://github.com/johnStauffer/usgs-waterservices-openapi#readme",
+  "devDependencies": {
+    "redoc-cli": "^0.13.20",
+    "yaml-lint": "^1.7.0",
+    "swagger-cli": "^4.0.4"
+  },
+  "dependencies": {}
+}

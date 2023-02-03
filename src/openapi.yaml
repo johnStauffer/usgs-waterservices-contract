@@ -1,0 +1,152 @@
+openapi: 3.1.0
+servers:
+  - url: waterservices.usgs.gov/nwis
+info:
+  description: |-
+    Api contract for USGS Water Services REST Web Services. This project is unaffiliated with USGS.
+    ### [USGS REST Services](https://waterservices.usgs.gov/rest/)
+    - Instantaneous Values
+      - [Service Description](https://waterservices.usgs.gov/rest/IV-Service.html)
+      - [Test Tool](https://waterservices.usgs.gov/rest/IV-Test-Tool.html)
+    - Daily Values
+      - [Service Description](https://waterservices.usgs.gov/rest/DV-Service.html)
+      - [Test Tool](https://waterservices.usgs.gov/rest/DV-Test-Tool.html)
+  version: 1.0.0
+  title: USGS Water Services
+tags:
+  - name: Instantaneous Values
+    description: Service to retrieve recent and historical values for streamflow as well as data for other regular time-series parameters served by the USGS.
+    externalDocs:
+      description: USGS Documentation
+      url: 'https://waterservices.usgs.gov/rest/IV-Service.html'
+  - name: Daily Values
+    description: Service to retrieve daily statistical data about the hundreds of thousands of hydrologic sites served by the USGS.
+    externalDocs:
+      description: USGS Documentation
+      url: 'https://waterservices.usgs.gov/rest/DV-Service.html'
+paths:
+  /iv:
+    get:
+      tags:
+        - Instantaneous Values
+      summary: Get Instantaneous Values
+      description: |-
+        Service to retrieve recent and historical values for streamflow as well as data for other regular time-series parameters served by the USGS.
+        #### Filtering
+        Requires one and only one major filter
+        - site(s)
+        - stateCd
+        - huc
+        - bBox
+        - countyCd
+      operationId: getInstantaneousValues
+      parameters:
+        - name: site
+          in: query
+          description: |-
+            *major filter*  
+            Hydrological Site number  
+            Sites may be prefixed with an optional agency code followed by a colon ie. `USGS:01646500`  
+            Can be found with the [NWIS Mapper](http://wdr.water.usgs.gov/nwisgmap/index.html) or on
+            the [USGS Water Data for the Nation](http://waterdata.usgs.ogv/nwis/) site  
+            *aliases: site, location* 
+          required: false
+          schema:
+            oneOf: 
+              - type: string
+              - type: integer
+            example: 01646500
+        - name: sites
+          in: query
+          description: |-
+            *major filter*  
+            List of Hydrological Site Numbers
+            Sites may be prefixed with an optional agency code followed by a colon ie. `USGS:01646500`  
+            *See site parameter for additional information on Site Numbers*
+          required: false
+          schema:
+            type: array
+            maxItems: 100
+            minItems: 1
+            items:
+              oneOf:
+                - type: string
+                - type: integer
+        - name: stateCd
+          in: query
+          description: |- 
+            *major filter*  
+            U.S. postal service (2-digit) state code [USPS List of State Codes](http://www.usps.com/ncsc/lookups/usps_abbreviations.html) 
+          required: false
+          schema:
+            type: string
+            example: NY
+        - name: huc
+          in: query
+          description: |- 
+            *major filter*  
+            A list of hydrologic unit codes (HUC) or watersheds. [List of HUCs](http://water.usgs.gov/GIS/huc_name.html)  
+            Only one major HUC can be specified per request. Major HUCs have two digits while minor HUCs must be eight digits.
+          required: false
+          schema:
+            type: array
+            minItems: 1
+            items:
+              example: [01,02070010]
+              type: integer
+        - name: bBox
+          in: query
+          description: |- 
+            *major filter*  
+            A contiguous range of decimal latitude and longitude, starting with the west longitude, then the south latitude, then the east longitude, and then 
+            the north latitude with each value separated by a comma. The product of the range of latitude and longitude cannot exceed 25 degrees. Whole or decimal 
+            degrees must be specified, up to six digits of precision. Minutes and seconds are not allowed. Remember: western longitude (which includes almost all of the 
+            United States) is specified in negative degrees. Caution: many sites outside the continental US do not have latitude and longitude referenced to NAD83 and 
+            therefore can not be found using these arguments. Certain sites are not associated with latitude and longitude due to homeland security concerns and cannot 
+            be found using this filter.
+          required: false
+          schema:
+            type: array
+            minItems: 4
+            maxItems: 4
+            items:
+              example: [-83,36.5,-81,38.5]
+              type: integer
+        - name: countyCd
+          in: query
+          description: |- 
+            *major filter*  
+            list of county numbers, in a 5 digit numeric format. The first two digits of a county's code are the [FIPS State Code](http://www.itl.nist.gov/fipspubs/fip5-2.htm). 
+            [List of county codes](http://help.waterdata.usgs.gov/code/county_query?fmt=html)
+          required: false
+          schema:
+            type: array
+            minItems: 1
+            items:
+              example: [51059,51061]
+              type: integer
+      # TODO 
+      responses:
+        '200':
+          description: OK
+        '304': 
+          description: |- 
+            *Not Modified*  
+            This indicates your request was redirected using the proper URL. This may occur if the "path" of your URL is not fully qualified. Ideally a / is placed 
+            before the ? in the URL. Adding in this slash may make this go away. However, the request should still be processed.
+        '400':
+          description: |- 
+            *Bad Request*  
+            This often occurs if the URL arguments are inconsistent. An accompanying error should describe why the request was bad.  
+            Reasons include:  
+            - Using startDT and endDT with the period argument.
+            - Mixing startDt and endDt arguments where startDt includes a time zone and endDt does n
+        '403': 
+          description: |-
+            This should only occur if for some reason the USGS has blocked your Internet Protocol (IP) address from using the service. This can happen if we believe 
+            that your use of the service is so excessive that it is seriously impacting others using the service. To get unblocked, send us the URL you are using along with 
+            your client's IP using this form. We may require changes to your query and frequency of use in order to give you access to the service again.
+externalDocs:
+  description: Official USGS Water Services Docs 
+  url: 'https://waterservices.usgs.gov/'
+# components:
